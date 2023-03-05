@@ -31,6 +31,9 @@ class PostList(generics.ListCreateAPIView):
     # https://www.django-rest-framework.org/api-guide/filtering/#djangofilterbackend
     filterset_fields = [
         'category',
+        'likes__owner__profile',
+        'favourites__owner__profile',
+        'owner__profile',
     ]
     ordering_fields = [
         'favourites_count',
