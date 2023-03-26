@@ -4,9 +4,9 @@
 
 [Live site for the Back End](https://ck-fsd-console-geeks.herokuapp.com/)
 
-[Live site for the Front End](https://be-inspired-pp5-ci.herokuapp.com/)
+[Live site for the Front End](https://ck-fsd-console-geeks-pp5.herokuapp.com/)
 
-[Front End Respository](https://github.com/RoshnaVakkeel/be-inspired-pp5-ci)
+[Front End Respository](https://github.com/ChrisKellFSD/console-geeks)
 
 ## Table of Contents
 
@@ -40,14 +40,14 @@
 ## Design
 
 ### User Stories
-The API was designed using the back end to achieve the user stories mentioned in the front end of 'Be Inspired' project. The back-end focuses on its administration side and can be described as one user story:
+The API was designed using the back end to achieve the user stories mentioned in the front end of the 'Console Geeks' project. The backend focuses on administration and can be described as one user story:
 
 As an admin, I want to be able to create, edit and delete the users, posts, comments and likes, so that I can have full control the application using its CRUD features.
 
 ### Database Schema
 The database was built using the Django Rest Framework. It makes use of Django models, serializers, and views. The Data Schema was designed as shown below:
 
-![Database Schema](docs/images/database_schema_be_inspired.png)
+![Database Schema](docs/images/database_schema-01.png)
 
 ### Details
 
