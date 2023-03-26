@@ -1,108 +1,625 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+# CONSOLE GEEKS - API
 
-Welcome ChrisKellFSD,
+## Links to Repositories and Live Sites
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. It's perfectly ok to use this template as the basis for your project submissions.
+[Live site for the Back End](https://ck-fsd-console-geeks.herokuapp.com/)
 
-You can safely delete this README.md file, or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use. Some of this information has been updated since the video content was created. The last update to this file was: **September 1, 2021**
+[Live site for the Front End](https://be-inspired-pp5-ci.herokuapp.com/)
 
-## Gitpod Reminders
+[Front End Respository](https://github.com/RoshnaVakkeel/be-inspired-pp5-ci)
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
+## Table of Contents
 
-`python3 -m http.server`
+- [Design](<#design>)
+	- [User Stories](<#user-stories>)
+	- [Database Schema](<#database-schema>)
+	- [Details](<#details>)
+        - [User](<#user>)
+	    - [Profile](<#profile>)
+	    - [Post](<#post>)
+        - [Recommendation](<#recommendation>)
+		- [Comment](<#comment>)
+	    - [Like](<#like>)
+		- [Followers](<#followers>)
+- [Technologies](<#technologies>)
+	- [Development Technologies](<#development-technologies>)
+	- [Testing Technologies](<#testing-technologies>)
+- [Django](<#django>)
+	- [Project Setup](<#project-setup>)
+	- [Custom API with DRF](<#custom-api-with-drf>)
+	- [JWT Tokens](<#jwt-tokens>)
+- [Deployment](<#deployment>)
+    - [Heroku](<#heroku>)
+- [Issues and Fixes](<#issues-and-fixes>)
+- [Testing](<#testing>)
+	- [Manual Testing](<#manual-testing>)
+	- [Validation](<#validation>)
+- [Credits and Resources](<#credits-and-resources>)
+	- [Code](<#code>)
 
-A blue button should appear to click: _Make Public_,
+## Design
 
-Another blue button should appear to click: _Open Browser_.
+### User Stories
+The API was designed using the back end to achieve the user stories mentioned in the front end of 'Be Inspired' project. The back-end focuses on its administration side and can be described as one user story:
 
-To run a backend Python file, type `python3 app.py`, if your Python file is named `app.py` of course.
+As an admin, I want to be able to create, edit and delete the users, posts, comments and likes, so that I can have full control the application using its CRUD features.
 
-A blue button should appear to click: _Make Public_,
+### Database Schema
+The database was built using the Django Rest Framework. It makes use of Django models, serializers, and views. The Data Schema was designed as shown below:
 
-Another blue button should appear to click: _Open Browser_.
+![Database Schema](docs/images/database_schema_be_inspired.png)
 
-In Gitpod you have superuser security privileges by default. Therefore you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+### Details
 
-To log into the Heroku toolbelt CLI:
+#### User 
 
-1. Log in to your Heroku account and go to *Account Settings* in the menu under your avatar.
-2. Scroll down to the *API Key* and click *Reveal*
-3. Copy the key
-4. In Gitpod, from the terminal, run `heroku_config`
-5. Paste in your API key when asked
+##### Model
+- The User model consists of information about the user and is a part of Django allauth library. 
+- Relationships of User entity with other entities
+	- One-to-one relation with the Profile entity owner field
+	- One-to-many ForeignKey relation with the Follower entity owner and followed fields
+	- One-to-many ForeignKey relation with the Post entity owner field
+	- One-to-many ForeignKey relation with the Recommendation entity owner field
+	- One-to-many ForeignKey relation with the Comment entity owner field
+	- One-to-many ForeignKey relation with the Like entity owner field
 
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you so do not share it. If you accidentally make it public then you can create a new one with _Regenerate API Key_.
+#### Profile 
 
-------
+##### Profile Model
+- The Profile entity contains the following keys: owner, name, age_group, brief_bio, created_on, updated_on and image
+- One-to-one relation between the owner field and the user entity id field
 
-## Release History
+##### Profile Serializer
+The Profile model serializer adds additional fields when a model instance that is returned by the API:
+- is_owner: To know if the user making the request is the owner
+- following_id: To know who the user is following
+- posts_count: To know how many posts have been created by the user
+- recommendations_count: To know how many recommendations have been created by the user
 
-We continually tweak and adjust this template to help give you the best experience. Here is the version history:
+##### Profile Views
+Django generics API views were used for Profile model:
+- ListAPIView enables:
+	- Users to create their Profile
+	- Users to retrieve a list of Profiles
+- RetrieveUpdateAPIView enables:
+	- Users to obtain a single Profile instance
+	- Users to update a single Profile instance (if it is theirs)
 
-**September 1 2021:** Remove `PGHOSTADDR` environment variable.
+#### Post 
 
-**July 19 2021:** Remove `font_fix` script now that the terminal font issue is fixed.
+##### Post Model
+- The Post entity contains the fields: owner, title, category, description, created_on, updated_on and image
+- Relationships of Post entity with other entities
+	- One-to-many ForeignKey relation with the Comment entity owner field
+	- One-to-many ForeignKey relation with the Like entity owner field
 
-**July 2 2021:** Remove extensions that are not available in Open VSX.
+##### Post Serializer
+The Post model serializer adds additional fields for when a model instance that is returned by the API:
+- is_owner: Whether the user making the request is the owner
+- profile_id: The profile id of the user that created the post
+- profile_image: The profile image of the user that made the post
+- comments_count: To know how many comments did the post recieve
+- likes_count: To know how many likes did the post recieve
+- like_id: checks if the logged in user has liked any posts
 
-**June 30 2021:** Combined the P4 and P5 templates into one file, added the uptime script. See the FAQ at the end of this file.
+##### Post Views
+Django generics API views were used for Post model:
+- ListCreateAPIView enables:
+	- Users to create Posts
+	- Users to retrieve a list of Posts
+- RetrieveUpdateDestroyAPIView enables:
+	- Users to obtain a single Post instance
+	- Users to update a single Post instance (if they own it)
 
-**June 10 2021:** Added: `font_fix` script and alias to fix the Terminal font issue
+#### Recommedation
 
-**May 10 2021:** Added `heroku_config` script to allow Heroku API key to be stored as an environment variable.
+##### Recommedation Model
+- The Recommedation entity contains the fields: owner, title, category, description, created_on, updated_on and image
+- Relationships of Recommedation entity with other entities
+	- One-to-many ForeignKey relation with the Comment entity owner field
+	- One-to-many ForeignKey relation with the Like entity owner field
 
-**April 7 2021:** Upgraded the template for VS Code instead of Theia.
+##### Recommendation Serializer
+The Recommendation model serializer adds additional fields for when a model instance that is returned by the API:
+- is_owner: Whether the user making the request is the owner
+- profile_id: The profile id of the user that created the Recommendation
+- profile_image: The profile image of the user that made the Recommendation
+- comments_count: To know how many comments did the Recommendation recieve
+- likes_count: To know how many likes did the Recommendation recieve
+- like_id: checks if the logged in user has liked any Recommendations
 
-**October 21 2020:** Versions of the HTMLHint, Prettier, Bootstrap4 CDN and Auto Close extensions updated. The Python extension needs to stay the same version for now.
+##### Recommendation Views
+Django generics API views were used for Recommendation model:
+- ListCreateAPIView enables:
+	- Users to create Recommendations
+	- Users to retrieve a list of Recommendations
+- RetrieveUpdateDestroyAPIView enables:
+	- Users to obtain a single Recommendation instance
+	- Users to update a single Recommendation instance (if they own it)
 
-**October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
+#### Comments
 
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
+##### Comments Model
+- The Comment entity contains the fields: owner, content, post, recommendation, created_on, updated_on
+- Relationships of Comment entity with other entities
+	- ForeignKey relation with the Post entity owner field
+	- ForeignKey relation with the Recommendation entity owner field
 
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
+##### Comment Serializer
+The Comment model serializer adds additional fields for when a model instance that is returned by the API:
+- is_owner: Whether the user making the request is the owner
+- profile_id: The profile id of the user that created the Comment
+- profile_image: The profile image of the user that made the Comment
+- created_on: To calculate how long ago the comment was created
+- updated_on: To calculate how long ago the comment was updated
 
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
+##### Comment Views
+Django generics API views were used for Comment model:
+- ListCreateAPIView enables:
+	- Users to create Comments
+	- Users to retrieve a list of Comments
+- RetrieveUpdateDestroyAPIView enables:
+	- Users to obtain a single Comment instance
+	- Users to update a single Comment instance (if they own it)
 
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
+#### Likes
 
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
+##### Like Model
+- The Like entity contains the fields: owner, post, recommendation, created_on
+- Relationships of Like entity with other entities
+	- ForeignKey relation with the Post entity owner field
+	- ForeignKey relation with the Recommendation entity owner field
 
-------
+##### Like Serializer
+The Like model serializer adds additional fields for when a model instance that is returned by the API:
+- owner: To display username of the user
 
-## FAQ about the uptime script
+##### Like Views
+Django generics API views were used for Like model:
+- ListCreateAPIView enables:
+	- Users to retrieve a list of Likes and create a Like
+- RetrieveUpdateAPIView enables the users:
+	- to get a single Like instance
+	- to delete a single Like instance (if they own it)
 
-**Why have you added this script?**
+#### Follower 
 
-It will help us to calculate how many running workspaces there are at any one time, which greatly helps us with cost and capacity planning. It will help us decide on the future direction of our cloud-based IDE strategy.
+##### Follower Model
+- The Follower entity contains the fields: owner, followed and created_on
+- ForeignKey relation between the owner field and the User model id field
+- ForeignKey relation between the followed field and the User model id field
 
-**How will this affect me?**
+##### Follower Serializer
+The Follower model serializer adds additional fields for when a model instance that is returned by the API:
+- owner: To display username of the user
+- followed_name: To display the name of the user who is following the user
 
-For everyday usage of Gitpod, it doesn’t have any effect at all. The script only captures the following data:
+##### Follower Views
+Django generics API views were used for Follower model:
+- ListCreateAPIView enables:
+	- Users to retrieve a list of Followers and create a Follower
+- RetrieveUpdateAPIView enables the users:
+	- to get a single Follower instance
+	- to delete a single Follower instance (if they own it)
 
-- An ID that is randomly generated each time the workspace is started.
-- The current date and time
-- The workspace status of “started” or “running”, which is sent every 5 minutes.
+### Development Technologies
 
-It is not possible for us or anyone else to trace the random ID back to an individual, and no personal data is being captured. It will not slow down the workspace or affect your work.
+**Languages**
+- [Python](https://en.wikipedia.org/wiki/Python_(programming_language))
 
-**So….?**
+**Frameworks & Libraries**
 
-We want to tell you this so that we are being completely transparent about the data we collect and what we do with it.
+- [Django](https://www.djangoproject.com/) - to build the database
+- [Cloudinary](https://cloudinary.com/) - to store and serve files
+- [Pillow](https://python-pillow.org/) - imaging library used to enable image fields in the Profile, Post and Recommendation models
+- [Django rest auth](https://django-rest-auth.readthedocs.io/en/latest/) - to implement account authorisation
+- [Django Rest Framework](https://www.django-rest-framework.org/) -  to develop the API that works in conjunction with the database
+-- [django-filter](https://django-filter.readthedocs.io/en/stable/) - used to enable filtering of resources
 
-**Can I opt out?**
+**Tools**
 
-Yes, you can. Since no personally identifiable information is being captured, we'd appreciate it if you let the script run; however if you are unhappy with the idea, simply run the following commands from the terminal window after creating the workspace, and this will remove the uptime script:
+- [Lucidchart](https://lucid.app/lucidchart/) - to create a diagram of the Database Schema
+- [Gitpod](https://www.gitpod.io/) - to code and develop the website
+- [Git](https://git-scm.com/) – for version control (Gitpod terminal to commit to Git, and pushing to GitHub)
+- [GitHub](https://github.com/) – to store the source code 
+- [Heroku](https://www.heroku.com/) - to host and deploy the live website
+- [Random Key Generator](https://randomkeygen.com/) - to generate secret key for Django 
+- [LICEcap](https://www.cockos.com/licecap/) - to capture an area of desktop and save it directly to .GIF (for viewing in web browsers). All the testing gifs have been generated using this tool.
 
-```
-pkill uptime.sh
-rm .vscode/uptime.sh
-```
+### Testing Technologies
 
-**Anything more?**
+Only Manual Testing was attempted due to really less time available to set up the whole project. Automated testing is still in my to do list.
 
-Yes! We'd strongly encourage you to look at the source code of the `uptime.sh` file so that you know what it's doing. As future software developers, it will be great practice to see how these shell scripts work.
+[Back to top ⇧](#contents)
 
----
+## Django
 
-Happy coding!
+### Project Setup
+Django Rest Framework (DRF) was used to create this API. DRF project was set up and many necessary dependencies were installed following these steps:
+
+1. Within your development environment/terminal, install Django with: `pip3 install 'django<4'` to install Django framework.
+2. The code at terminal `pip3 install <package>` was used to install different dependencies:
+- `pip3 install django-cloudinary-storage`- for Cloudinary to store uploaded image files
+- `pip3 install Pillow` - To allow ImageFields to be used in the database models
+- `pip3 install djangorestframework`- To install Django Rest Framework
+
+3. Once these dependencies are installed, requirements.txt is updated using: `pip3 freeze > requirements.txt`. 
+4. New Django project using the command `django-admin startproject <your-project-name> .` (dot at the end is necessary create it in root directory).
+5. Add your installed apps to the `settings.py` file INSTALLED_APPS variable. The required lines are:
+~~~
+'cloudinary_storage',
+'cloudinary',
+~~~
+6. To configure cloudinary, the following variables need to be set in settings.py: 
+- `CLOUDINARY_STORAGE`: this should be set to your own cloudinary URL. Create env.py file in root directory and create a`CLOUDINARY_URL` environment variable in an env.py file like this
+~~~
+import os
+
+os.environ['CLOUDINARY_URL'] = 'cloudinary:<url from personal cloudinary account>
+~~~
+
+and import this into the settings.py file using:
+~~~
+import os
+if os.path.exists('env'):
+    import env
+~~~
+ 
+`CLOUDINARY_STORAGE` is to be set to: `{'CLOUDINARY_URL': os.environ.get('CLOUDINARY_URL')}` which retrieves the env.py variable in a development environment, but also allows a Config Var to be set in Heroku for later deployment to Heroku.
+
+- `MEDIA_URL`: this is set to '/media/' in this project
+- `DEFAULT_FILE_STORAGE`: is to be set to 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+7. . Whilst in the `env.py` file, create a `SECRET_KEY` variable which will be used later for Heroku deployment. To generate a new Django secret key, do a google search for a random key generator and use one of the results to create a key. The variable can be created using: 
+~~~
+os.environ ["SECRET_KEY"] = "<copy and paste the secret key>"
+~~~
+Back in settings.py, find the `SECRET_KEY` variable and replace the assignment as follows:
+~~~
+SECRET_KEY = os.environ.get('SECRET_KEY')
+~~~
+At the terminal
+~~~
+git add .
+git commit -m "initial commit"
+git push
+~~~
+
+[Credit for the write-up- Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api)
+
+- App Creation
+After creation of new App using `python3 manage.py startapp <app>`, it must be added to installed apps in settings.py.
+
+- Once the database models are created in 'models.py' file, they must be registered in 'admin.py' file of the respective app directory. Later the migrations must be made to the database.
+
+### Custom API with DRF
+To create APIs using Django Rest Framework. These steps are to be followed 
+
+**Installation**
+Within the development environment, these dependencies also need to be installed with :
+- `pip3 install djangorestframework`- installs the Django Rest Framework
+- `pip3 install django-filter`- allows filtering, searching and sorting of API data
+
+In `settings.py` file go to INSTALLED_APPS variable and add:
+~~~
+'rest_framework',
+'django_filters',
+~~~
+After installation, generate a requirements.txt document. 
+
+**Serializers**
+
+"Serializers allow complex data such as querysets and model instances to be converted to native Python datatypes that can then be easily rendered into JSON, XML or other content types." -- [source](https://www.django-rest-framework.org/api-guide/serializers/#serializers). These work similarly to Django's Form and ModelForm classes.
+
+- Serializers are declared to serialize and deserialize data that corresponds to Model objects.
+- In order to return complete object instances based on the validated data .create() and .update() methods are used.
+- 
+
+**Views**
+
+Throughout in the DRF views.py file, GenericAPIView was used.
+"Using the APIView class is similar to a regular View class, as usual, the incoming request is dispatched to an appropriate handler method such as .get() or .post(). Additionally, a number of attributes may be set on the class that control various aspects of the API policy." - [source](
+https://www.django-rest-framework.org/api-guide/views/)
+
+To control the basic view behavior these attributes were used [(source)](https://www.django-rest-framework.org/api-guide/generic-views/): 
+- serializer_class - The serializer class used for validating and deserializing input, and for serializing output.
+- permission_class - To allow only user to be able to access the view
+- queryset - The queryset is used for returning objects from this view.
+- filter_backends - A list of filter backend classes are used for filtering the queryset. Defaults to the same value as the DEFAULT_FILTER_BACKENDS setting. 
+
+Install Django Filters: `pip3 install django-filter`
+In settings.py, in templates add: 'django-filters'
+Then update dependencies using `pip3 freeze > requirements.txt`
+
+Additionally generate a view to render in 'views.py' file and create and wire up 'urls.py' in the respective directory. Then in 'urls.py' of project directory, for Class-based views
+- Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+
+### JWT Tokens 
+
+To configure and enable JWT Tokens, the following steps were folowed:
+
+1. Install the dj-rest-auth package for JWT tokens using `pip3 install djangorestframework-simplejwt`
+2. Create a session authentication value for differentiating between Development and Production environments, this should be added to the env.py file: `os.environ['DEV'] = '1'`
+3. Use the session authentication value in settings.py to determine whether to use SessionAuthentication (for in Dev) or JWT Tokens (for in Production) using the following:
+~~~
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [( 
+        'rest_framework.authentication.SessionAuthentication' 
+        if 'DEV' in os.environ 
+        else 'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+    )]
+}
+~~~
+4. Add `REST_USE_JWT = True` to enable token authentication
+5. Add `JWT_AUTH_SECURE = True` to ensure tokens are only sent over HTTPS
+6. Give cookie names to the access and refresh tokens using:
+~~~
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+~~~
+
+[Credit for the write-up- Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api)
+
+## Deployment
+
+### Heroku
+For steps I referred to the [write up credit to- Adam Hatton's Quizle Readme](https://github.com/adamhatton/quizle-drf-api/)
+
+## Issues and Fix
+
+- Issue 1:
+In Django Admin, Home › Comments › Comments › Add comment section, while saving a Comment error appears. It says that all the fields are cumpulsory. Comments Entity has foreign key relationship with Post and Recommedation entities. So, in the Comment model, both post and recommedation fields were defined. The field class type for both was provided as null=True considering the empty value to be accepted.
+~~~
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True
+        )
+    recommendation = models.ForeignKey(
+        Recommendation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True
+        )
+~~~
+
+But Django admin would only save the comment if both fields were selected. I wanted them to be independent i.e. 
+
+Fix:
+
+The field class type was changed from null=True to blank=True and the issue was solved. It was a validation error. In the field options, null is purely database-related, whereas blank is validation-related.
+Reference: https://docs.djangoproject.com/en/4.1/topics/db/models/
+
+
+- Issue 2: Multiple migration error into database
+My Like model has foreign key relationship with both Post and Recommendation entities. I can only add a like if I select both Post and Recommendation, but I wanted them to be independent. So, I added blank=True in field class types. But then I could not migrate the changes to database. Like issue 1, I added field class type as blank=True and skipped null=True. But in the terminal then new error appeared upon running 'python3 manage.py migrate' command. Error at terminal: 
+django.db.utils.IntegrityError: NOT NULL constraint failed: new__comments_comment.post_id
+
+Fix: 
+With the help of Tutor support (special thanks to Ed, CI), as suggested, I deleted the latest migration instances and manually and migrated freshly and the issue solved. 
+
+- Issue 3: Integrity Error
+My issue 2 persisted. My Like model has foreign key relationship with both Post and Recommendation entities. I can only add a like if I select both Post and Recommendation, but I wanted them to be independent. So, I added blank=True and null=True in field class types. 
+
+Then when post is selected and not recommendation, the error reads:
+django.db.utils.IntegrityError: NOT NULL constraint failed: likes_like.recommendation_id
+
+Then when a recommendation is selected and not a post, the error reads:
+django.db.utils.IntegrityError: NOT NULL constraint failed: likes_like.post_id
+
+Then I removed blank=True field class types for both posts and recommendations fields. The issue now is that when both options are not selected in Home › Likes › Likes › Add like in Django admin page, validation error is raised that both the fields are required. 
+[Screenshots of the error 3](docs/issues/issue_3_integrity_error.pdf)
+
+- Fix: To solve it, I created a separate app for Recommedation Likes called likes_recommendations and then I could select it without any clash. Similarly, I could also extend it to Posts. But with fronend I see that there is no issue. User can like a post without a need to select a Recommendation. 
+
+- Issue 3: Category Selection
+In the frontend, I added badges to enable search of posts using badges. Upon usin setCategory function, the selected badge with category must return response. 
+
+-Fix: I added category in fiterset_fields = [categrory,] to solve this.
+
+[Back to top ⇧](#contents)
+
+## Testing
+
+### Manual Testing
+This user story as an admin was tested:
+"As an admin, I want to be able to create, edit and delete the users, posts, comments and likes, so that I can have full control the application using its CRUD features."
+
+**Results are enlisted in the table**
+
+**Test** | **Action** | **Expected Result** | **Test Result**
+-------- | ------------------- | ------------------- | -----------------
+User | Update and/or delete user | A user can be updated and/or deleted |**Pass**
+Profile | Update and/or delete profile | A users' profile can be updated and/or deleted | **Pass**
+Post | Create/ Update and/or delete post | A post can be created/ edited and/or deleted | **Pass**
+Recommendation | Create/ Update and/or delete recommendation | A recommendation can be Created/ Updated and/or deleted | **Pass**
+Comments | Create/ Update and/or delete comment | A comment can be Created/ Updated and/or deleted | **Pass**
+Likes | Create/ Change and/or delete Likes | A Like can be Created/ Changed and/or deleted | **Pass**
+Followers | Create/ Change and/or delete followers | Followers can be Created/ Changed and/or deleted | **Pass**
+
+The tests for CRUD features were run on Django Rest Framework(DRF-UI) and on Django-Admin panel. The details are as follows:
+
+#### Django Rest Framework - User Interface
+
+- To access the Django Rest Framework(DRF-UI), at terminal run command `python3 manage.py runserver`. It is accessible in a preview window.
+
+**Paths with which pages can be accessed**
+Using the URLconf defined in be_inspired_dr_api.urls, one can access the pages on preview window "...gitpod.io/extensions"
+Different pages can be accessed using following extensions:
+
+admin/
+
+api-auth/
+
+dj-rest-auth/logout/
+
+dj-rest-auth/
+
+dj-rest-auth/registration/
+
+profiles/
+
+profiles/<int:pk>/
+
+posts/
+
+posts/<int:pk>/
+
+recommendations/
+
+recommendations/<int:pk>/
+
+comments/
+
+comments/<int:pk>/
+
+likes/
+
+likes/<int:pk>
+
+likes_recommendations/
+
+likes_recommendations/<int:pk>
+
+followers/
+
+followers/<int:pk>/
+
+
+- To get to the preview link, follow the steps as shown in the gif below:
+
+	![DRF UI visible to logged out user](docs/manual_testing_drf_user_interface/root_route.gif)
+
+- All the features and links that can be accessed are shown below.
+
+	[DRF UI visible to logged out user](docs/manual_testing_drf_user_interface/root_route_logged_out.gif)
+
+- Manual tests for **Profile** CRUD features
+
+	In DRF-UI, the profiles page can be accessed using extension "/profiles" for list and details "profiles/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Profiles List View](docs/manual_testing_drf_user_interface/profiles_list.gif) 
+	- [Profile details upon profile selection using it's "id"](docs/manual_testing_drf_user_interface/profiles_id.gif) 
+	- [Profiles filters](docs/manual_testing_drf_user_interface/profiles_filters.gif) 
+
+- Manual tests for **Post** CRUD features
+	In DRF-UI, the profiles page can be accessed using extension "/posts" for list and details "posts/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Posts List View](docs/manual_testing_drf_user_interface/posts_list_post_create_update_test.gif) 
+	- [Post details upon post selection using it's "id"](docs/manual_testing_drf_user_interface/posts_list_post_details.gif) 
+	- [Posts filters](docs/manual_testing_drf_user_interface/posts_list_filters.gif) 
+
+- Manual tests for **Recommendation** CRUD features
+
+	In DRF-UI, the recommendations page can be accessed using extension "/recommendations" for list and details "recommendations/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Recommendations List View](docs/manual_testing_drf_user_interface/recommendations_list.gif) 
+	- [Recommendation details upon recommendation selection using it's "id"](docs/manual_testing_drf_user_interface/recommendations_detail.gif) 
+	- [Recommendations filters](docs/manual_testing_drf_user_interface/recommendations_filters.gif) 
+
+- Manual tests for **Comment** CRUD features
+
+	In DRF-UI, the comments page can be accessed using extension "/comments" for list and details "comments/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Comments List View](docs/manual_testing_drf_user_interface/comments_list_create_update.gif) 
+	- [Comment details upon comment selection using it's "id"](docs/manual_testing_drf_user_interface/comments_list_details.gif) 
+	- [Comments filters](docs/manual_testing_drf_user_interface/comments_filter.gif) 
+
+- Manual tests for **Like** CRUD features
+
+	In DRF-UI, the likes page can be accessed using extension "/likes" for list and details "likes/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Like list view and details upon comment selection using it's "id"](docs/manual_testing_drf_user_interface/likes_list_and_details.gif) 
+
+	In the DRF-UI and Admin panel, as the **Like** model shares foreign key relationship with both Recommendation and Post models. And as the the post or recommendation liked once cannot be liked twice by a user, there was an issue in liking a post or a recommendation separately. This issue can be seen in the gif below. It is also explained in Issues section.
+
+	- [Likes List Issue](docs/manual_testing_drf_user_interface/likes_list_issue.gif) 
+
+	As a solution (as per suggestion by my mentor Elaine B. Roche), I tried separating the like model for recommendation from post. Thus, I created another App to only like recommendation individually. The tests can be found below. The issue is also noted in Issues and Fix section below.
+
+	In DRF-UI, the likes page can be accessed using extension "/likes_recommendations" for list and details "likes_recommendations/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [likes_recommendations list view](docs/manual_testing_drf_user_interface/likes_recommendations_list.gif) 
+
+	- [likes_recommendations details view](docs/manual_testing_drf_user_interface/likes_recommendations_details.gif) 
+
+	**Important**: The issue even though persists in Backend, however it had no effect on the frontend. It was possible to like a post separately than recommendation and there was no interference observed. So, I proceeded to make just one new Like_Recommendation model.
+
+- Manual tests for **Followers** CRUD features
+
+	In DRF-UI, the followers page can be accessed using extension "/followers" for list and details "followers/<int:pk>/". The pages can be seen as shown below in gifs:
+
+	- [Followers List View](docs/manual_testing_drf_user_interface/followers_list.gif) 
+
+	- [Follower Detail View](docs/manual_testing_drf_user_interface/follower_detail.png) 
+
+[Back to top ⇧](#contents)
+
+#### Django Admin Panel Maual Testing
+
+Using the URLconf defined in be_inspired_dr_api.urls, one can access the pages on preview window "...gitpod.io/admin/" or https://be-inspired-drf-api.herokuapp.com/admin/
+
+All the CRUD features were tested here as well. 
+
+- Manual tests for **User** CRUD features	
+
+	- [User admin page](docs/manual_testing_admin_panel/users_admin_page.gif) 
+	- [User Add/Update/Delete function](docs/manual_testing_admin_panel/user_test.gif)
+
+- Manual tests for **Profile** CRUD features
+
+	- [Profile Update Test](docs/manual_testing_admin_panel/profile_edit.gif)  
+
+	- [Profile addition not allowed, Django creates it only editing possible](docs/manual_testing_admin_panel/profile_create_edit.gif)
+	
+- Manual tests for **Post** CRUD features
+
+	[Post Add/Update/Delete](docs/manual_testing_admin_panel/post_create_edit_delete.gif)
+
+	[Post Add/Update/Delete](docs/manual_testing_admin_panel/post_create_edit.gif)
+
+- Manual tests for **Recommendation** CRUD features
+
+	[Recommendation Add/Update/Delete](docs/manual_testing_admin_panel/recommendation_create_edit.gif)
+
+- Manual tests for **Comment** CRUD features
+
+	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/comment_create_edit.gif)
+
+- Manual tests for **Like** CRUD features
+	As mentioned, the CRUD features work appropriately but the issue of not being able to select just the post or recommendation remains. 
+	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/likes_issue.gif)
+
+	Manual tests for **Like_Recommendation** CRUD features
+	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/likes_recommendation.gif)
+
+- Manual tests for **Follower** CRUD features
+
+	[Follower Add/Update/Delete](docs/manual_testing_admin_panel/followers.gif)
+
+### Validation
+
+#### Pep8 Validation
+The Python code has been validated using [Pep8 Validation Service](http://pep8online.com/) - no errors or warnings were found.
+There were no errors found. The full report can be found [here](docs/validations/CI_python_linter_backend.pdf)
+
+[Back to top ⇧](#contents)
+
+## Credits and Resources
+- Django REST Framework Documentation
+- The codes were highly and heavily rely on CI's DRF-API walkthrough.
+- DRF installation, project set up and deployment sections were copied from [Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api) and were edited as I performed in my project. 
+- Other references for the project and learning resources were:
+- [SnapFood API in DRF](https://github.com/aleksandracodes/snapfood-drf-api)
+- [Buzz of Berlin DRF API](https://github.com/vkleer/Buzz_of_Berlin_DRF_API)
+- [ci-pp5-gamer-verse-drf-api](https://github.com/Jbachtiger/ci-pp5-gamer-verse-drf-api)
+- Stack Overflow
+
+## Acknowledgements
+
+- A very heartfelt thanks to my mentor Elaine B. Roche for her feedback on the project and suggestions for improvement. 
+- My fellow friends of Code Institute Kristyna Maulerova, Jyoti Yadav. A very special thanks to Tony Albanese for helping me get past major hurdles while setting up the project. 
+- Code Institute's Tutor support - Ed and Gemma
+
+[Back to top ⇧](#contents)

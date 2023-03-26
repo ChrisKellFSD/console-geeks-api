@@ -67,6 +67,11 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
+if 'CLIENT_ORIGIN' in os.environ:
+    CORS_ALLOWED_ORIGINS = [
+        os.environ.get('CLIENT_ORIGIN')
+    ]
+
 
 # Application definition
 
