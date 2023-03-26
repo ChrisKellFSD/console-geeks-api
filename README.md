@@ -17,10 +17,11 @@
         - [User](<#user>)
 	    - [Profile](<#profile>)
 	    - [Post](<#post>)
-        - [Recommendation](<#recommendation>)
+        - [Follower](<#follower>)
 		- [Comment](<#comment>)
 	    - [Like](<#like>)
-		- [Followers](<#followers>)
+		- [Favourite](<#favourite>)
+        - [Contact](<#contact)
 - [Technologies](<#technologies>)
 	- [Development Technologies](<#development-technologies>)
 	- [Testing Technologies](<#testing-technologies>)
@@ -51,156 +52,59 @@ The database was built using the Django Rest Framework. It makes use of Django m
 
 ### Details
 
-#### User 
+<details><summary>User</summary>
 
-##### Model
-- The User model consists of information about the user and is a part of Django allauth library. 
-- Relationships of User entity with other entities
-	- One-to-one relation with the Profile entity owner field
-	- One-to-many ForeignKey relation with the Follower entity owner and followed fields
-	- One-to-many ForeignKey relation with the Post entity owner field
-	- One-to-many ForeignKey relation with the Recommendation entity owner field
-	- One-to-many ForeignKey relation with the Comment entity owner field
-	- One-to-many ForeignKey relation with the Like entity owner field
+- One-to-one relation with the Profile model owner field
+- ForeignKey relation with the Post model owner field
+- ForeignKey relation with the Follower model owner_following and followed fields
+- ForeignKey relation with the Comment model owner field
+- ForeignKey relation with the Like model owner field
+- ForeignKey relation with the Favourite model owner field
+- ForeignKey relation with the Contact model owner field</details>
 
-#### Profile 
+<details><summary>Profile</summary>
 
-##### Profile Model
-- The Profile entity contains the following keys: owner, name, age_group, brief_bio, created_on, updated_on and image
-- One-to-one relation between the owner field and the user entity id field
+- The Profile model contains the following fields: ID, owner, created_at, updated_at, name, content and image
+- One-to-one relation between the owner field and the User model id field</details>
 
-##### Profile Serializer
-The Profile model serializer adds additional fields when a model instance that is returned by the API:
-- is_owner: To know if the user making the request is the owner
-- following_id: To know who the user is following
-- posts_count: To know how many posts have been created by the user
-- recommendations_count: To know how many recommendations have been created by the user
+<details><summary>Post</summary>
 
-##### Profile Views
-Django generics API views were used for Profile model:
-- ListAPIView enables:
-	- Users to create their Profile
-	- Users to retrieve a list of Profiles
-- RetrieveUpdateAPIView enables:
-	- Users to obtain a single Profile instance
-	- Users to update a single Profile instance (if it is theirs)
+- The Post model contains the following fields: ID, owner, created_at, updated_at, title, content, category and image
+- ForeignKey relation with the Comment model post field
+- ForeignKey relation with the Like model post field
+- ForeignKey relation with the Favourite model post field</details>
 
-#### Post 
+<details><summary>Follower</summary>
 
-##### Post Model
-- The Post entity contains the fields: owner, title, category, description, created_on, updated_on and image
-- Relationships of Post entity with other entities
-	- One-to-many ForeignKey relation with the Comment entity owner field
-	- One-to-many ForeignKey relation with the Like entity owner field
+- The Follower model contains the following fields: ID, owner, following and created_at
+- ForeignKeyUser relation between the following and the User model id field
+- ForeignKeyUser relation between the followed field and the User model post field</details>
 
-##### Post Serializer
-The Post model serializer adds additional fields for when a model instance that is returned by the API:
-- is_owner: Whether the user making the request is the owner
-- profile_id: The profile id of the user that created the post
-- profile_image: The profile image of the user that made the post
-- comments_count: To know how many comments did the post recieve
-- likes_count: To know how many likes did the post recieve
-- like_id: checks if the logged in user has liked any posts
+<details><summary>Comment</summary>
 
-##### Post Views
-Django generics API views were used for Post model:
-- ListCreateAPIView enables:
-	- Users to create Posts
-	- Users to retrieve a list of Posts
-- RetrieveUpdateDestroyAPIView enables:
-	- Users to obtain a single Post instance
-	- Users to update a single Post instance (if they own it)
+- The Comment model contains the following fields: ID, owner, post, created_at, updated_at and content
+- ForeignKeyUser relation between the owner field and the User model id field
+- ForeignKeyUser relation between the post field and the User model post field</details>
 
-#### Recommedation
+<details><summary>Like</summary>
 
-##### Recommedation Model
-- The Recommedation entity contains the fields: owner, title, category, description, created_on, updated_on and image
-- Relationships of Recommedation entity with other entities
-	- One-to-many ForeignKey relation with the Comment entity owner field
-	- One-to-many ForeignKey relation with the Like entity owner field
-
-##### Recommendation Serializer
-The Recommendation model serializer adds additional fields for when a model instance that is returned by the API:
-- is_owner: Whether the user making the request is the owner
-- profile_id: The profile id of the user that created the Recommendation
-- profile_image: The profile image of the user that made the Recommendation
-- comments_count: To know how many comments did the Recommendation recieve
-- likes_count: To know how many likes did the Recommendation recieve
-- like_id: checks if the logged in user has liked any Recommendations
-
-##### Recommendation Views
-Django generics API views were used for Recommendation model:
-- ListCreateAPIView enables:
-	- Users to create Recommendations
-	- Users to retrieve a list of Recommendations
-- RetrieveUpdateDestroyAPIView enables:
-	- Users to obtain a single Recommendation instance
-	- Users to update a single Recommendation instance (if they own it)
-
-#### Comments
-
-##### Comments Model
-- The Comment entity contains the fields: owner, content, post, recommendation, created_on, updated_on
-- Relationships of Comment entity with other entities
-	- ForeignKey relation with the Post entity owner field
-	- ForeignKey relation with the Recommendation entity owner field
-
-##### Comment Serializer
-The Comment model serializer adds additional fields for when a model instance that is returned by the API:
-- is_owner: Whether the user making the request is the owner
-- profile_id: The profile id of the user that created the Comment
-- profile_image: The profile image of the user that made the Comment
-- created_on: To calculate how long ago the comment was created
-- updated_on: To calculate how long ago the comment was updated
-
-##### Comment Views
-Django generics API views were used for Comment model:
-- ListCreateAPIView enables:
-	- Users to create Comments
-	- Users to retrieve a list of Comments
-- RetrieveUpdateDestroyAPIView enables:
-	- Users to obtain a single Comment instance
-	- Users to update a single Comment instance (if they own it)
-
-#### Likes
-
-##### Like Model
-- The Like entity contains the fields: owner, post, recommendation, created_on
-- Relationships of Like entity with other entities
-	- ForeignKey relation with the Post entity owner field
-	- ForeignKey relation with the Recommendation entity owner field
-
-##### Like Serializer
-The Like model serializer adds additional fields for when a model instance that is returned by the API:
-- owner: To display username of the user
-
-##### Like Views
-Django generics API views were used for Like model:
-- ListCreateAPIView enables:
-	- Users to retrieve a list of Likes and create a Like
-- RetrieveUpdateAPIView enables the users:
-	- to get a single Like instance
-	- to delete a single Like instance (if they own it)
-
-#### Follower 
-
-##### Follower Model
-- The Follower entity contains the fields: owner, followed and created_on
+- The Like model contains the following fields: ID, owner, post and created_at
+- ForeignKey relation between the ID field and the User model id field
 - ForeignKey relation between the owner field and the User model id field
-- ForeignKey relation between the followed field and the User model id field
+- ForeignKey relation between the post field and the Post model post field</details>
 
-##### Follower Serializer
-The Follower model serializer adds additional fields for when a model instance that is returned by the API:
-- owner: To display username of the user
-- followed_name: To display the name of the user who is following the user
+<details><summary>Favourite</summary>
 
-##### Follower Views
-Django generics API views were used for Follower model:
-- ListCreateAPIView enables:
-	- Users to retrieve a list of Followers and create a Follower
-- RetrieveUpdateAPIView enables the users:
-	- to get a single Follower instance
-	- to delete a single Follower instance (if they own it)
+- The Favourite model contains the following fields: ID, owner, post and created_at
+- ForeignKey relation between the ID field and the User model id field
+- ForeignKey relation between the owner field and the User model id field
+- ForeignKey relation between the post field and the Post model post field</details>
+
+<details><summary>Contact</summary>
+
+- The Contact model contains the following fields: ID, owner, name, subject and message
+- ForeignKey relation between the ID field and the User model id field
+- ForeignKey relation between the owner field and the User model id field</details>
 
 ### Development Technologies
 
@@ -218,13 +122,13 @@ Django generics API views were used for Follower model:
 
 **Tools**
 
-- [Lucidchart](https://lucid.app/lucidchart/) - to create a diagram of the Database Schema
+- [Figma](https://figma.com/) - to create a diagram of the Database Schema
 - [Gitpod](https://www.gitpod.io/) - to code and develop the website
 - [Git](https://git-scm.com/) – for version control (Gitpod terminal to commit to Git, and pushing to GitHub)
 - [GitHub](https://github.com/) – to store the source code 
 - [Heroku](https://www.heroku.com/) - to host and deploy the live website
 - [Random Key Generator](https://randomkeygen.com/) - to generate secret key for Django 
-- [LICEcap](https://www.cockos.com/licecap/) - to capture an area of desktop and save it directly to .GIF (for viewing in web browsers). All the testing gifs have been generated using this tool.
+- [Screen2Gif](https://www.screentogif.com/) - to capture an area of desktop and save it directly to .GIF (for viewing in web browsers). All the testing gifs have been generated using this tool.
 
 ### Testing Technologies
 
@@ -284,8 +188,6 @@ git add .
 git commit -m "initial commit"
 git push
 ~~~
-
-[Credit for the write-up- Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api)
 
 - App Creation
 After creation of new App using `python3 manage.py startapp <app>`, it must be added to installed apps in settings.py.
@@ -358,65 +260,14 @@ JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 ~~~
 
-[Credit for the write-up- Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api)
-
 ## Deployment
 
 ### Heroku
-For steps I referred to the [write up credit to- Adam Hatton's Quizle Readme](https://github.com/adamhatton/quizle-drf-api/)
+For steps I referred to the Code Institute DRF API walkthrough project.
 
 ## Issues and Fix
 
 - Issue 1:
-In Django Admin, Home › Comments › Comments › Add comment section, while saving a Comment error appears. It says that all the fields are cumpulsory. Comments Entity has foreign key relationship with Post and Recommedation entities. So, in the Comment model, both post and recommedation fields were defined. The field class type for both was provided as null=True considering the empty value to be accepted.
-~~~
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        default=None,
-        null=True
-        )
-    recommendation = models.ForeignKey(
-        Recommendation,
-        on_delete=models.CASCADE,
-        default=None,
-        null=True
-        )
-~~~
-
-But Django admin would only save the comment if both fields were selected. I wanted them to be independent i.e. 
-
-Fix:
-
-The field class type was changed from null=True to blank=True and the issue was solved. It was a validation error. In the field options, null is purely database-related, whereas blank is validation-related.
-Reference: https://docs.djangoproject.com/en/4.1/topics/db/models/
-
-
-- Issue 2: Multiple migration error into database
-My Like model has foreign key relationship with both Post and Recommendation entities. I can only add a like if I select both Post and Recommendation, but I wanted them to be independent. So, I added blank=True in field class types. But then I could not migrate the changes to database. Like issue 1, I added field class type as blank=True and skipped null=True. But in the terminal then new error appeared upon running 'python3 manage.py migrate' command. Error at terminal: 
-django.db.utils.IntegrityError: NOT NULL constraint failed: new__comments_comment.post_id
-
-Fix: 
-With the help of Tutor support (special thanks to Ed, CI), as suggested, I deleted the latest migration instances and manually and migrated freshly and the issue solved. 
-
-- Issue 3: Integrity Error
-My issue 2 persisted. My Like model has foreign key relationship with both Post and Recommendation entities. I can only add a like if I select both Post and Recommendation, but I wanted them to be independent. So, I added blank=True and null=True in field class types. 
-
-Then when post is selected and not recommendation, the error reads:
-django.db.utils.IntegrityError: NOT NULL constraint failed: likes_like.recommendation_id
-
-Then when a recommendation is selected and not a post, the error reads:
-django.db.utils.IntegrityError: NOT NULL constraint failed: likes_like.post_id
-
-Then I removed blank=True field class types for both posts and recommendations fields. The issue now is that when both options are not selected in Home › Likes › Likes › Add like in Django admin page, validation error is raised that both the fields are required. 
-[Screenshots of the error 3](docs/issues/issue_3_integrity_error.pdf)
-
-- Fix: To solve it, I created a separate app for Recommedation Likes called likes_recommendations and then I could select it without any clash. Similarly, I could also extend it to Posts. But with fronend I see that there is no issue. User can like a post without a need to select a Recommendation. 
-
-- Issue 3: Category Selection
-In the frontend, I added badges to enable search of posts using badges. Upon usin setCategory function, the selected badge with category must return response. 
-
--Fix: I added category in fiterset_fields = [categrory,] to solve this.
 
 [Back to top ⇧](#contents)
 
@@ -440,164 +291,6 @@ Followers | Create/ Change and/or delete followers | Followers can be Created/ C
 
 The tests for CRUD features were run on Django Rest Framework(DRF-UI) and on Django-Admin panel. The details are as follows:
 
-#### Django Rest Framework - User Interface
-
-- To access the Django Rest Framework(DRF-UI), at terminal run command `python3 manage.py runserver`. It is accessible in a preview window.
-
-**Paths with which pages can be accessed**
-Using the URLconf defined in be_inspired_dr_api.urls, one can access the pages on preview window "...gitpod.io/extensions"
-Different pages can be accessed using following extensions:
-
-admin/
-
-api-auth/
-
-dj-rest-auth/logout/
-
-dj-rest-auth/
-
-dj-rest-auth/registration/
-
-profiles/
-
-profiles/<int:pk>/
-
-posts/
-
-posts/<int:pk>/
-
-recommendations/
-
-recommendations/<int:pk>/
-
-comments/
-
-comments/<int:pk>/
-
-likes/
-
-likes/<int:pk>
-
-likes_recommendations/
-
-likes_recommendations/<int:pk>
-
-followers/
-
-followers/<int:pk>/
-
-
-- To get to the preview link, follow the steps as shown in the gif below:
-
-	![DRF UI visible to logged out user](docs/manual_testing_drf_user_interface/root_route.gif)
-
-- All the features and links that can be accessed are shown below.
-
-	[DRF UI visible to logged out user](docs/manual_testing_drf_user_interface/root_route_logged_out.gif)
-
-- Manual tests for **Profile** CRUD features
-
-	In DRF-UI, the profiles page can be accessed using extension "/profiles" for list and details "profiles/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Profiles List View](docs/manual_testing_drf_user_interface/profiles_list.gif) 
-	- [Profile details upon profile selection using it's "id"](docs/manual_testing_drf_user_interface/profiles_id.gif) 
-	- [Profiles filters](docs/manual_testing_drf_user_interface/profiles_filters.gif) 
-
-- Manual tests for **Post** CRUD features
-	In DRF-UI, the profiles page can be accessed using extension "/posts" for list and details "posts/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Posts List View](docs/manual_testing_drf_user_interface/posts_list_post_create_update_test.gif) 
-	- [Post details upon post selection using it's "id"](docs/manual_testing_drf_user_interface/posts_list_post_details.gif) 
-	- [Posts filters](docs/manual_testing_drf_user_interface/posts_list_filters.gif) 
-
-- Manual tests for **Recommendation** CRUD features
-
-	In DRF-UI, the recommendations page can be accessed using extension "/recommendations" for list and details "recommendations/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Recommendations List View](docs/manual_testing_drf_user_interface/recommendations_list.gif) 
-	- [Recommendation details upon recommendation selection using it's "id"](docs/manual_testing_drf_user_interface/recommendations_detail.gif) 
-	- [Recommendations filters](docs/manual_testing_drf_user_interface/recommendations_filters.gif) 
-
-- Manual tests for **Comment** CRUD features
-
-	In DRF-UI, the comments page can be accessed using extension "/comments" for list and details "comments/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Comments List View](docs/manual_testing_drf_user_interface/comments_list_create_update.gif) 
-	- [Comment details upon comment selection using it's "id"](docs/manual_testing_drf_user_interface/comments_list_details.gif) 
-	- [Comments filters](docs/manual_testing_drf_user_interface/comments_filter.gif) 
-
-- Manual tests for **Like** CRUD features
-
-	In DRF-UI, the likes page can be accessed using extension "/likes" for list and details "likes/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Like list view and details upon comment selection using it's "id"](docs/manual_testing_drf_user_interface/likes_list_and_details.gif) 
-
-	In the DRF-UI and Admin panel, as the **Like** model shares foreign key relationship with both Recommendation and Post models. And as the the post or recommendation liked once cannot be liked twice by a user, there was an issue in liking a post or a recommendation separately. This issue can be seen in the gif below. It is also explained in Issues section.
-
-	- [Likes List Issue](docs/manual_testing_drf_user_interface/likes_list_issue.gif) 
-
-	As a solution (as per suggestion by my mentor Elaine B. Roche), I tried separating the like model for recommendation from post. Thus, I created another App to only like recommendation individually. The tests can be found below. The issue is also noted in Issues and Fix section below.
-
-	In DRF-UI, the likes page can be accessed using extension "/likes_recommendations" for list and details "likes_recommendations/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [likes_recommendations list view](docs/manual_testing_drf_user_interface/likes_recommendations_list.gif) 
-
-	- [likes_recommendations details view](docs/manual_testing_drf_user_interface/likes_recommendations_details.gif) 
-
-	**Important**: The issue even though persists in Backend, however it had no effect on the frontend. It was possible to like a post separately than recommendation and there was no interference observed. So, I proceeded to make just one new Like_Recommendation model.
-
-- Manual tests for **Followers** CRUD features
-
-	In DRF-UI, the followers page can be accessed using extension "/followers" for list and details "followers/<int:pk>/". The pages can be seen as shown below in gifs:
-
-	- [Followers List View](docs/manual_testing_drf_user_interface/followers_list.gif) 
-
-	- [Follower Detail View](docs/manual_testing_drf_user_interface/follower_detail.png) 
-
-[Back to top ⇧](#contents)
-
-#### Django Admin Panel Maual Testing
-
-Using the URLconf defined in be_inspired_dr_api.urls, one can access the pages on preview window "...gitpod.io/admin/" or https://be-inspired-drf-api.herokuapp.com/admin/
-
-All the CRUD features were tested here as well. 
-
-- Manual tests for **User** CRUD features	
-
-	- [User admin page](docs/manual_testing_admin_panel/users_admin_page.gif) 
-	- [User Add/Update/Delete function](docs/manual_testing_admin_panel/user_test.gif)
-
-- Manual tests for **Profile** CRUD features
-
-	- [Profile Update Test](docs/manual_testing_admin_panel/profile_edit.gif)  
-
-	- [Profile addition not allowed, Django creates it only editing possible](docs/manual_testing_admin_panel/profile_create_edit.gif)
-	
-- Manual tests for **Post** CRUD features
-
-	[Post Add/Update/Delete](docs/manual_testing_admin_panel/post_create_edit_delete.gif)
-
-	[Post Add/Update/Delete](docs/manual_testing_admin_panel/post_create_edit.gif)
-
-- Manual tests for **Recommendation** CRUD features
-
-	[Recommendation Add/Update/Delete](docs/manual_testing_admin_panel/recommendation_create_edit.gif)
-
-- Manual tests for **Comment** CRUD features
-
-	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/comment_create_edit.gif)
-
-- Manual tests for **Like** CRUD features
-	As mentioned, the CRUD features work appropriately but the issue of not being able to select just the post or recommendation remains. 
-	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/likes_issue.gif)
-
-	Manual tests for **Like_Recommendation** CRUD features
-	[Comment Add/Update/Delete](docs/manual_testing_admin_panel/likes_recommendation.gif)
-
-- Manual tests for **Follower** CRUD features
-
-	[Follower Add/Update/Delete](docs/manual_testing_admin_panel/followers.gif)
-
 ### Validation
 
 #### Pep8 Validation
@@ -609,17 +302,10 @@ There were no errors found. The full report can be found [here](docs/validations
 ## Credits and Resources
 - Django REST Framework Documentation
 - The codes were highly and heavily rely on CI's DRF-API walkthrough.
-- DRF installation, project set up and deployment sections were copied from [Adam Hatton's quizle-drf-api](https://github.com/adamhatton/quizle-drf-api) and were edited as I performed in my project. 
-- Other references for the project and learning resources were:
-- [SnapFood API in DRF](https://github.com/aleksandracodes/snapfood-drf-api)
-- [Buzz of Berlin DRF API](https://github.com/vkleer/Buzz_of_Berlin_DRF_API)
-- [ci-pp5-gamer-verse-drf-api](https://github.com/Jbachtiger/ci-pp5-gamer-verse-drf-api)
 - Stack Overflow
 
 ## Acknowledgements
 
-- A very heartfelt thanks to my mentor Elaine B. Roche for her feedback on the project and suggestions for improvement. 
-- My fellow friends of Code Institute Kristyna Maulerova, Jyoti Yadav. A very special thanks to Tony Albanese for helping me get past major hurdles while setting up the project. 
-- Code Institute's Tutor support - Ed and Gemma
+- A very 
 
 [Back to top ⇧](#contents)
