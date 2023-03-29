@@ -18,16 +18,12 @@
 	- [Development Technologies](<#development-technologies>)
 - [Django](<#django>)
 	- [Project Setup](<#project-setup>)
-	- [Custom API with DRF](<#custom-api-with-drf>)
-	- [JWT Tokens](<#jwt-tokens>)
 - [Deployment](<#deployment>)
-    - [Heroku](<#heroku>)
 - [Testing](<#testing>)
 	- [Automated Testing](<#automated-testing>)
 	- [Manual Testing](<#manual-testing>)
 	- [Validation](<#validation>)
 - [Credits and Resources](<#credits-and-resources>)
-	- [Code](<#code>)
 
 ## Design
 
@@ -180,7 +176,7 @@ After creation of new App using `python3 manage.py startapp <app>`, it must be a
 
 - Once the database models are created in 'models.py' file, they must be registered in 'admin.py' file of the respective app directory. Later the migrations must be made to the database.
 
-## Project Deployment
+## Deployment
 
 ### Set up JSON Web Tokens
 1. Run terminal command `pip install dj-rest-auth` to install JSON web token authenication
@@ -258,7 +254,7 @@ JWT_AUTH_SECURE = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 ```
-15. Create a serializers.py file in your main drf directory e.g. pp5_gamer_verse_drf_api and copy the UserDetailsSerializer code from the Django documentation:
+15. Create a serializers.py file in your main drf directory and copy the UserDetailsSerializer code from the Django documentation:
 ```
 from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
@@ -312,7 +308,7 @@ DATABASES = {
 11. Add a Procfile to the root directory and add the below code to it:
 ```
 release: python manage.py makemigrations && python manage.py migrate
-web: gunicorn pp5_gamer_verse_drf_api.wsgi
+ web: gunicorn console_geeks_api.wsgi
 ```
 12. Add the following ALLOWED_HOSTS in settings.py:
 ```
@@ -404,7 +400,7 @@ DEBUG = 'DEV' in os.environ
 ### dj_rest-auth bug fix
 dj-rest-auth currently has a bug where user are unable to log out. To fix this issues, please follow these steps.
 
-1. In your main drf project e.g. pp5_gamer_verse_drf_api, navigate to the view.py file
+1. In your main drf project navigate to the view.py file
 2. Import JWT_AUTH settings from settings.py:
 ```
 from .settings import (
@@ -482,6 +478,24 @@ if 'CLIENT_ORIGIN_DEV' in os.environ:
 ```
 7. `git add .`, `git commit -m"Your message"`, `git push`
 8. In Heroku, manually deploy app one last time
+
+### Forking Repository
+You can fork the GitHub repository to make a copy of the original to view and change without affecting the original. This can be done by:
+
+1. Log into GitHub or create an account
+2. Locate the repository you want to fork
+3. At the top of the repository, on the right-hand side of the page you will see an option to select "Fork" from the available buttons
+4. Click the fork button and a copy of the repository will have been created
+
+### Cloning Repository
+You can create a clone of your repository by:
+
+1. Locate the repository you wish to clone
+2. Click the arrow on the 'Code' button at the top of the list of files
+3. Select the clone by https and copy the URL using the provided clipboard
+4. Navigate to your chosen code editor and within the terminal change the directory to the location your to clone the repository to
+5. Type 'git clone' and paste the https link you copied from GitHub
+6. Press enter and git will clone the repository to your local machine
 
 [Back to top ⇧](#contents)
 
