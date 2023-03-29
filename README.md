@@ -570,7 +570,6 @@ The python code was validated throughout using CI's pep validator linter without
 [Back to top ⇧](#contents)
 
 ## Credits and Resources
-- Django REST Framework Documentation
 - The codes were highly and heavily rely on CI's DRF-API walkthrough.
 - Stack Overflow
 
